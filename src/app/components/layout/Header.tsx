@@ -1,21 +1,40 @@
-'use client'; // ¡IMPORTANTE: Esta línea debe estar siempre en la parte superior!
+'use client'; 
 
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image'; 
+
+// Importaciones de iconos de Heroicons
 import {
   PhoneIcon,
   Bars3Icon,
   XMarkIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-} from '@heroicons/react/24/outline';
+}
+ from '@heroicons/react/24/outline';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faFacebookF, 
+  faInstagram, 
+  faYoutube, 
+  faTwitter, 
+  faLinkedinIn 
+} from '@fortawesome/free-brands-svg-icons';
 
 // Estructura de navegación
 interface NavItem {
   name: string;
   href: string;
   subItems?: NavItem[];
+}
+
+// Estructura de Social Links
+interface SocialLink {
+  label: string;
+  icon: any;
+  href: string;
 }
 
 const navItems: NavItem[] = [
@@ -64,32 +83,32 @@ export default function Header() {
   const [activeSubMenu, setActiveSubMenu] = useState<string | null>(null);
   const [openMobileSubMenu, setOpenMobileSubMenu] = useState<string | null>(null);
 
-  const socialLinks = [
-    { label: 'Facebook', icon: 'f', href: '#' }, 
-    { label: 'Instagram', icon: 'i', href: '#' }, 
-    { label: 'YouTube', icon: 'y', href: '#' }, 
-    { label: 'Twitter', icon: 't', href: '#' }, 
-    { label: 'LinkedIn', icon: 'l', href: '#' }, 
+  const socialLinks: SocialLink[] = [
+    { label: 'Facebook', icon: faFacebookF, href: '#' }, 
+    { label: 'Instagram', icon: faInstagram, href: '#' }, 
+    { label: 'YouTube', icon: faYoutube, href: '#' }, 
+    { label: 'Twitter', icon: faTwitter, href: '#' }, 
+    { label: 'LinkedIn', icon: faLinkedinIn, href: '#' }, 
   ];
 
   // Componente de Enlace de Menú de Escritorio
   const DesktopMenuLink: React.FC<{ item: NavItem }> = ({ item }) => {
-    // La clase 'h-full' es clave para que el div de hover tome toda la altura
     const baseClasses =
-      'block px-3 py-2 text-sm font-medium text-white transition duration-150 ease-in-out uppercase border-b-2 h-full inline-flex items-center cursor-pointer';
+      'block px-3 py-4 text-sm text-white transition duration-150 ease-in-out uppercase cursor-pointer rounded-lg ' + 
+      'font-bold tracking-widest my-auto'; 
 
-    // hover:bg-[#320455] (un morado más oscuro que --primary para el hover)
     const hoverClasses =
-      'hover:border-[var(--secondary)] hover:bg-[#320455] border-transparent';
+      'hover:bg-[var(--terceary)] hover:text-[var(--secondary)]'; 
 
+    const activeClasses = 
+        item.name === 'INICIO' 
+        ? 'bg-[var(--terceary)] text-[var(--secondary)]'
+        : '';
+        
     return (
       <Link
         href={item.href}
-        className={`${baseClasses} ${hoverClasses} ${
-            // Aplicar bg oscuro al elemento "INICIO" si es el activo
-            // Puedes ajustar esta lógica para que el elemento activo se determine de otra forma (e.g., ruta actual)
-            item.name === 'INICIO' ? 'bg-[#320455]' : '' 
-        }`}
+        className={`${baseClasses} ${hoverClasses} ${activeClasses}`}
       >
         {item.name}
       </Link>
@@ -98,18 +117,35 @@ export default function Header() {
 
   // Componente de Submenú de Escritorio (Dropdown)
   const DesktopSubMenu: React.FC<{ items: NavItem[] }> = ({ items }) => (
-    // 'mt-[1px]' para que el submenú toque el borde inferior del header
-    <div className="absolute left-0 mt-[1px] w-64 origin-top-right rounded-b-lg shadow-lg">
-      <div className="rounded-b-lg bg-[var(--secondary)] text-[var(--text-color)] ring-1 ring-black ring-opacity-5">
-        <div className="py-1">
+    <div className="absolute right-0 mt-[-4px] w-64 rounded-lg shadow-2xl z-50">
+
+      <div 
+        className="absolute -top-3 w-0 h-0 border-l-[11px] border-r-[11px] border-b-[11px] border-l-transparent border-r-transparent border-b-[var(--primary)]"
+        style={{ right: '0.9rem' }} 
+        aria-hidden="true" 
+      />
+      
+      {/* Triángulo de Relleno */}
+      <div 
+        className="absolute -top-[10px] w-0 h-0 border-l-[10px] border-r-[10px] border-b-[10px] border-l-transparent border-r-transparent border-b-[var(--secondary)]"
+        style={{ right: '1rem' }} 
+        aria-hidden="true" 
+      />
+
+      {/* CUERPO DEL SUBMENÚ */}
+      <div className="rounded-lg bg-[var(--secondary)] text-[var(--primary)] overflow-hidden">
+        <div className="py-2 px-2 space-y-1">
           {items.map((subItem) => (
             <Link
               key={subItem.name}
               href={subItem.href}
-              // El hover es ahora Primary (Morado Oscuro) con texto blanco, como se ve en las capturas
-              className="block px-4 py-2 text-sm hover:bg-[var(--primary)] hover:text-white transition duration-150 ease-in-out"
+              className="block"
             >
-              {subItem.name}
+                <div
+                    className="px-2 py-2 text-sm font-bold uppercase rounded-md transition duration-150 ease-in-out hover:bg-[#20c78a]"
+                >
+                    {subItem.name}
+                </div>
             </Link>
           ))}
         </div>
@@ -139,7 +175,7 @@ export default function Header() {
                     className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white hover:bg-[var(--primary)]"
                   >
                     {item.name}
-                  </button>
+                    </button>
                 ) : (
                   <Link
                     href={item.href}
@@ -195,10 +231,10 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50">
-      {/* 1. Top Bar */}
-      <div className="bg-[var(--primary)] text-white py-2 px-4 text-sm"> 
+      {/* Top Bar */}
+      <div className="bg-[var(--terceary)] text-white py-2 px-4 text-sm"> 
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          {/* Llámenos - ACTUALIZADO: Enlace clickeable y en color secondary */}
+          {/* Llámenos */}
           <a 
             href="tel:+573058873351"
             className="flex items-center text-[var(--secondary)] transition duration-150 hover:text-[#2fe5ad]" 
@@ -209,18 +245,20 @@ export default function Header() {
 
           {/* Idiomas y Redes Sociales */}
           <div className="flex items-center space-x-4">
-            {/* Idiomas (oculto en pantallas pequeñas) */}
+            {/* Idiomas */}
             <div className="space-x-2 font-bold hidden sm:block">
-              {/* Idioma activo 'ES' en color --secondary */}
+              {/* Idioma activo */}
               <span className="text-[var(--secondary)]">ES</span> 
               <span className="cursor-pointer hover:text-gray-300">EN</span>
             </div>
             {/* Redes Sociales */}
-            {/* Iconos de redes sociales en color --secondary */}
             <div className="flex space-x-3 text-[var(--secondary)]"> 
               {socialLinks.map((link, index) => (
-                <a key={index} href={link.href} className="hover:text-gray-300" aria-label={link.label}>
-                  {link.icon} {/* Reemplaza con SVG real si los obtienes */}
+                <a key={index} href={link.href} className="hover:text-gray-300 flex items-center" aria-label={link.label}>
+                  <FontAwesomeIcon 
+                    icon={link.icon} 
+                    className="w-4 h-4"
+                  />
                 </a>
               ))}
             </div>
@@ -234,7 +272,7 @@ export default function Header() {
           <div className="flex-shrink-0">
             <Link href="/">
               <Image 
-                src="/img/logo.png" // Asegúrate de que esta ruta sea correcta para tu proyecto (public/img/logo.png)
+                src="/img/logo.png"
                 alt="Geostigma Logo" 
                 width={180}
                 height={40}
@@ -245,13 +283,13 @@ export default function Header() {
           </div>
 
           {/* Menú de Escritorio */}
-          <div className="hidden lg:flex space-x-1 h-full">
+          <div className="hidden lg:flex space-x-1 h-full items-center">
             {navItems.map((item) => (
               <div
                 key={item.name}
                 onMouseEnter={() => setActiveSubMenu(item.name)}
                 onMouseLeave={() => setActiveSubMenu(null)}
-                className="relative h-full"
+                className="relative" 
               >
                 <DesktopMenuLink item={item} />
 
